@@ -34,10 +34,10 @@ df['Occupancy Efficiency (%)'] = (df["Total Units"] - df["Units Offline"]) / df[
 # Streamlit App Title
 st.title("CRF Vacancy Control Dashboard with Metric Comparison")
 
-# Function to plot comparison chart
+# Function to plot comparison chart (now a line graph)
 def plot_comparison_chart(metrics):
     fig, ax = plt.subplots()
-    df.set_index("Facility")[metrics].plot(kind="bar", ax=ax)
+    df.set_index("Facility")[metrics].plot(kind="line", marker='o', ax=ax)  # Change to line graph
     plt.title(f"Comparison of Metrics: {', '.join(metrics)}")
     plt.ylabel("Values")
     plt.xticks(rotation=45, ha="right")
