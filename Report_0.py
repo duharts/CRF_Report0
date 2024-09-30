@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import matplotlib.pyplot as plt
 
 # Sample Data extracted from the CRF Vacancy Control Dashboards
 data = {
@@ -22,64 +23,34 @@ data = {
 df = pd.DataFrame(data)
 
 # Streamlit App Title
-st.title("CRF Vacancy Control Dashboard")
+st.title("CRF Vacancy Control Dashboard - Stacked Bar Charts")
 
-# Section 1: Occupancy Rate Line Chart
-with st.expander("Occupancy Rate by Facility"):
-    st.subheader("Occupancy Rate by Facility")
-    st.line_chart(df.set_index("Facility")["Occupancy Rate (%)"])
+# Function to create a stacked bar chart
+def plot_stacked_bar(df, columns, title):
+    fig, ax = plt.subplots()
+    df[columns].plot(kind='bar', stacked=True, ax=ax)
+    plt.title(title)
+    plt.ylabel('Number of Units')
+    plt.xticks(rotation=45, ha='right')
+    st.pyplot(fig)
 
-# Section 2: Total Units Line Chart
-with st.expander("Total Units per Facility"):
-    st.subheader("Total Units per Facility")
-    st.line_chart(df.set_index("Facility")["Total Units"])
+# Plot Stacked Bar Charts for each section
+plot_stacked_bar(df, ["Available Units", "Reserved Units", "Units in Maintenance", "Units Under Repair", "Units in Long-Term Repair", "Units Offline"], "Unit Status by Facility")
 
-# Section 3: Available Units Line Chart
-with st.expander("Available Units per Facility"):
-    st.subheader("Available Units per Facility")
-    st.line_chart(df.set_index("Facility")["Available Units"])
+# Summary Statistics Section
+st.subheader("Summary Statistics")
+total_units = df["Total Units"].sum()
+occupied_units = df["Total Units"].sum() - df["Units Offline"].sum()
 
-# Section 4: Reserved Units Line Chart
-with st.expander("Reserved Units per Facility"):
-    st.subheader("Reserved Units per Facility")
-    st.line_chart(df.set_index("Facility")["Reserved Units"])
+st.write(f"Total Units Across All Facilities: {total_units}")
+st.write(f"Total Occupied Units Across All Facilities: {occupied_units}")
+st.write(f"Average Occupancy Rate Across All Facilities: {df['Occupancy Rate (%)'].mean():.2f}%")
 
-# Section 5: Units in Maintenance Line Chart
-with st.expander("Units in Maintenance per Facility"):
-    st.subheader("Units in Maintenance per Facility")
-    st.line_chart(df.set_index("Facility")["Units in Maintenance"])
-
-# Section 6: Units Under Repair Line Chart
-with st.expander("Units Under Repair per Facility"):
-    st.subheader("Units Under Repair per Facility")
-    st.line_chart(df.set_index("Facility")["Units Under Repair"])
-
-# Section 7: Units in Long-Term Repair Line Chart
-with st.expander("Units in Long-Term Repair per Facility"):
-    st.subheader("Units in Long-Term Repair per Facility")
-    st.line_chart(df.set_index("Facility")["Units in Long-Term Repair"])
-
-# Section 8: Units Offline Line Chart
-with st.expander("Units Offline per Facility"):
-    st.subheader("Units Offline per Facility")
-    st.line_chart(df.set_index("Facility")["Units Offline"])
-
-# Section 9: Summary Statistics
-with st.expander("Overall Summary Statistics"):
-    st.subheader("Summary Statistics")
-    total_units = df["Total Units"].sum()
-    occupied_units = df["Total Units"].sum() - df["Units Offline"].sum()
-    st.write(f"Total Units Across All Facilities: {total_units}")
-    st.write(f"Total Occupied Units Across All Facilities: {occupied_units}")
-    st.write(f"Average Occupancy Rate Across All Facilities: {df['Occupancy Rate (%)'].mean():.2f}%")
-
-# Download option
-with st.expander("Download Data"):
-    st.write("Download the filtered data as a CSV:")
-    csv = df.to_csv(index=False).encode('utf-8')
-    st.download_button(
-        label="Download Data as CSV",
-        data=csv,
-        file_name='CRF_Facility_Data.csv',
-        mime='text/csv',
-    )
+# Download Data as CSV
+csv = df.to_csv(index=False).encode('utf-8')
+st.download_button(
+    label="Download Data as CSV",
+    data=csv,
+    file_name='CRF_Facility_Data.csv',
+    mime='text/csv',
+)
