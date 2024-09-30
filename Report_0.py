@@ -32,7 +32,28 @@ df = pd.DataFrame(data)
 df['Occupancy Efficiency (%)'] = (df["Total Units"] - df["Units Offline"]) / df["Total Units"] * 100
 
 # Streamlit App Title
-st.title("Sample Vacancy Control Dashboard")
+st.title("CRF Vacancy Control Dashboard with Metric Comparison")
+
+# Function to plot comparison chart
+def plot_comparison_chart(metrics):
+    fig, ax = plt.subplots()
+    df.set_index("Facility")[metrics].plot(kind="bar", ax=ax)
+    plt.title(f"Comparison of Metrics: {', '.join(metrics)}")
+    plt.ylabel("Values")
+    plt.xticks(rotation=45, ha="right")
+    st.pyplot(fig)
+
+# Multiselect for choosing metrics to compare
+st.subheader("Choose Metrics to Compare")
+metrics = st.multiselect(
+    "Select Metrics for Comparison",
+    options=df.columns.drop("Facility"),  # Exclude Facility column
+    default=["Occupancy Rate (%)", "Units Offline"]  # Preselect common metrics
+)
+
+# Display comparison chart
+if metrics:
+    plot_comparison_chart(metrics)
 
 # Sleeker Occupancy Rate Overview
 st.subheader("1. Occupancy Rate Overview")
@@ -47,14 +68,6 @@ for index, value in enumerate(df["Occupancy Rate (%)"]):
 st.pyplot(fig)
 st.write(df[["Facility", "Occupancy Rate (%)"]])
 
-# Summary of Occupancy Rate
-st.markdown("""
-**Summary of Occupancy Rate**:  
-- The majority of facilities maintain an occupancy rate above 90%, which is a good indicator of operational effectiveness.
-- Facilities such as **Lenox** and **Kenilworth** have achieved a 100% occupancy rate, showing their optimal performance.
-- **Hope House** and **Best Western** are below 90%, indicating some underperformance.
-""")
-
 # Chart: Days Offline and Status
 st.subheader("2. Days Offline and Unit Status")
 fig, ax = plt.subplots()
@@ -65,14 +78,6 @@ plt.xticks(rotation=45, ha="right")
 st.pyplot(fig)
 st.write(df[["Facility", "Days Offline", "Status", "Details (Repairs Needed)", "Expected Date", "Time of Turnover"]])
 
-# Summary of Days Offline and Repairs
-st.markdown("""
-**Summary of Offline Days and Repairs**:  
-- **Light House** and **Comfort Inn** have the longest periods of offline units (25 and 31 days, respectively), largely due to major renovation and fumigation projects.
-- **Hope House** has shorter periods of downtime (8-10 days) with repairs focused on plumbing and extermination.
-- Facilities like **Kenilworth** have fast repair turnovers, completing work in just 2 days.
-""")
-
 # Facility Performance Comparison (Clustered Bar Chart)
 st.subheader("3. Facility Performance Comparison")
 fig, ax = plt.subplots()
@@ -82,13 +87,6 @@ plt.ylabel("Metrics")
 plt.xticks(rotation=45, ha="right")
 st.pyplot(fig)
 st.write(df[["Facility", "Occupancy Rate (%)", "Units Offline", "Units Under Repair", "Days Offline"]])
-
-# Summary of Facility Performance
-st.markdown("""
-**Summary of Facility Performance**:  
-- **Ellington**, **Apollo**, and **Lenox** are top performers with high occupancy rates and minimal offline or under-repair units.
-- **Light House** and **Hope House** show the highest number of offline or under-repair units, indicating the need for attention.
-""")
 
 # Efficiency Metric: Occupied Units vs Available Units (Occupancy Efficiency)
 st.subheader("4. Occupancy Efficiency Metric")
@@ -102,13 +100,6 @@ for index, value in enumerate(df["Occupancy Efficiency (%)"]):
     plt.text(value + 1, index, f"{value:.1f}%", va='center')
 st.pyplot(fig)
 st.write(df[["Facility", "Occupancy Efficiency (%)", "Cribs", "Days Offline"]])
-
-# Summary of Occupancy Efficiency
-st.markdown("""
-**Summary of Occupancy Efficiency**:  
-- **Lenox** and **Kenilworth** have achieved perfect efficiency, utilizing all their available units.
-- **Light House** and **Comfort Inn** are underperforming in efficiency due to the high number of offline units and long repair periods.
-""")
 
 # Download option
 st.subheader("Download Data")
