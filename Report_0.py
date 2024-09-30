@@ -35,38 +35,43 @@ filtered_df = df[(df['Occupancy Rate (%)'] >= occupancy_range[0]) & (df['Occupan
 if selected_facilities:
     filtered_df = filtered_df[filtered_df['Facility'].isin(selected_facilities)]
 
-# Display the filtered data
-st.subheader("Filtered Facility Data")
-st.dataframe(filtered_df)
+# Section: Filtered Data
+with st.expander("Filtered Facility Data"):
+    st.subheader("Filtered Facility Data")
+    st.dataframe(filtered_df)
 
-# Occupancy Rate Bar Chart
-st.subheader("Occupancy Rate by Facility")
-st.bar_chart(filtered_df.set_index("Facility")["Occupancy Rate (%)"])
+# Section: Occupancy Rate Line Chart
+with st.expander("Occupancy Rate by Facility (Line Chart)"):
+    st.subheader("Occupancy Rate by Facility")
+    st.line_chart(filtered_df.set_index("Facility")["Occupancy Rate (%)"])
 
-# Detailed Units Data
-st.subheader("Detailed Units Breakdown")
-st.write("This table shows detailed information about the units under repair, in long-term repair, or offline.")
-st.dataframe(filtered_df[[
-    "Facility", "Available Units", "Reserved Units", 
-    "Units in Maintenance", "Units Under Repair", 
-    "Units in Long-Term Repair", "Units Offline"
-]])
+# Section: Detailed Units Breakdown
+with st.expander("Detailed Units Breakdown"):
+    st.subheader("Detailed Units Breakdown")
+    st.write("This table shows detailed information about the units under repair, in long-term repair, or offline.")
+    st.dataframe(filtered_df[[
+        "Facility", "Available Units", "Reserved Units", 
+        "Units in Maintenance", "Units Under Repair", 
+        "Units in Long-Term Repair", "Units Offline"
+    ]])
 
-# Overall Summary Stats
-st.subheader("Overall Summary Statistics")
-total_units = df["Total Units"].sum()
-occupied_units = df["Total Units"].sum() - df["Units Offline"].sum()
+# Section: Summary Statistics
+with st.expander("Overall Summary Statistics"):
+    st.subheader("Overall Summary Statistics")
+    total_units = df["Total Units"].sum()
+    occupied_units = df["Total Units"].sum() - df["Units Offline"].sum()
 
-st.write(f"Total Units Across All Facilities: {total_units}")
-st.write(f"Total Occupied Units Across All Facilities: {occupied_units}")
-st.write(f"Average Occupancy Rate Across All Facilities: {df['Occupancy Rate (%)'].mean():.2f}%")
+    st.write(f"Total Units Across All Facilities: {total_units}")
+    st.write(f"Total Occupied Units Across All Facilities: {occupied_units}")
+    st.write(f"Average Occupancy Rate Across All Facilities: {df['Occupancy Rate (%)'].mean():.2f}%")
 
-# Additional Features: Download CSV
-st.sidebar.subheader("Download Filtered Data")
-csv = filtered_df.to_csv(index=False).encode('utf-8')
-st.sidebar.download_button(
-    label="Download Filtered Data as CSV",
-    data=csv,
-    file_name='filtered_facility_data.csv',
-    mime='text/csv',
-)
+# Download Filtered Data
+with st.expander("Download Filtered Data"):
+    st.sidebar.subheader("Download Filtered Data")
+    csv = filtered_df.to_csv(index=False).encode('utf-8')
+    st.download_button(
+        label="Download Filtered Data as CSV",
+        data=csv,
+        file_name='filtered_facility_data.csv',
+        mime='text/csv',
+    )
