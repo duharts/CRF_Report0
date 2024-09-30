@@ -32,7 +32,7 @@ df = pd.DataFrame(data)
 df['Occupancy Efficiency (%)'] = (df["Total Units"] - df["Units Offline"]) / df["Total Units"] * 100
 
 # Streamlit App Title
-st.title("CRF Vacancy Control Dashboard")
+st.title("CRF Sample Vacancy Control Dashboard")
 
 # Sleeker Occupancy Rate Overview
 st.subheader("1. Occupancy Rate Overview")
