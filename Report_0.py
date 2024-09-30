@@ -1,8 +1,10 @@
+# Let's build the Streamlit app with the detailed visualization design.
+
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 
-# Sample Data extracted from the CRF Vacancy Control Dashboards
+# Sample data extracted from the CRF Vacancy Control Dashboards
 data = {
     "Facility": [
         "Icahn House", "House East", "Hope House", "Kenilworth", 
@@ -23,34 +25,54 @@ data = {
 df = pd.DataFrame(data)
 
 # Streamlit App Title
-st.title("CRF Vacancy Control Dashboard - Stacked Bar Charts")
+st.title("CRF Vacancy Control Dashboard")
 
-# Function to create a stacked bar chart
-def plot_stacked_bar(df, columns, title):
-    fig, ax = plt.subplots()
-    df[columns].plot(kind='bar', stacked=True, ax=ax)
-    plt.title(title)
-    plt.ylabel('Number of Units')
-    plt.xticks(rotation=45, ha='right')
-    st.pyplot(fig)
+# Occupancy Rate Overview
+st.subheader("1. Occupancy Rate Overview")
+st.bar_chart(df.set_index("Facility")["Occupancy Rate (%)"])
 
-# Plot Stacked Bar Charts for each section
-plot_stacked_bar(df, ["Available Units", "Reserved Units", "Units in Maintenance", "Units Under Repair", "Units in Long-Term Repair", "Units Offline"], "Unit Status by Facility")
+# Facility-Level Unit Availability (Stacked Bar Chart)
+st.subheader("2. Facility-Level Unit Availability")
+fig, ax = plt.subplots()
+df.set_index("Facility")[["Available Units", "Reserved Units", "Units in Maintenance", "Units Under Repair", "Units Offline"]].plot(kind="bar", stacked=True, ax=ax)
+plt.title("Facility-Level Unit Status")
+plt.ylabel("Number of Units")
+plt.xticks(rotation=45, ha="right")
+st.pyplot(fig)
 
-# Summary Statistics Section
-st.subheader("Summary Statistics")
-total_units = df["Total Units"].sum()
-occupied_units = df["Total Units"].sum() - df["Units Offline"].sum()
+# Detailed Units in Maintenance or Repair
+st.subheader("3. Detailed Units in Maintenance or Repair")
+fig, ax = plt.subplots()
+df.set_index("Facility")[["Units in Maintenance", "Units Under Repair", "Units in Long-Term Repair"]].plot(kind="bar", stacked=True, ax=ax)
+plt.title("Detailed Units in Maintenance or Repair")
+plt.ylabel("Number of Units")
+plt.xticks(rotation=45, ha="right")
+st.pyplot(fig)
 
-st.write(f"Total Units Across All Facilities: {total_units}")
-st.write(f"Total Occupied Units Across All Facilities: {occupied_units}")
-st.write(f"Average Occupancy Rate Across All Facilities: {df['Occupancy Rate (%)'].mean():.2f}%")
+# Offline Unit Trends (Line Chart)
+st.subheader("4. Offline Unit Trends")
+st.line_chart(df.set_index("Facility")["Units Offline"])
 
-# Download Data as CSV
+# Occupied vs. Unoccupied Units (Donut Chart)
+st.subheader("5. Occupied vs. Unoccupied Units")
+occupied_units = df["Total Units"] - df["Units Offline"]
+unoccupied_units = df["Units Offline"]
+
+fig, ax = plt.subplots()
+ax.pie([occupied_units.sum(), unoccupied_units.sum()], labels=["Occupied Units", "Unoccupied Units"], autopct="%1.1f%%", startangle=90, colors=['#4CAF50', '#FF5722'])
+ax.axis("equal")  # Equal aspect ratio ensures the pie chart is circular.
+st.pyplot(fig)
+
+# Facility Performance Comparison (Clustered Bar Chart)
+st.subheader("6. Facility Performance Comparison")
+fig, ax = plt.subplots()
+df.set_index("Facility")[["Occupancy Rate (%)", "Units Offline", "Units Under Repair"]].plot(kind="bar", ax=ax)
+plt.title("Facility Performance Comparison")
+plt.ylabel("Metrics")
+plt.xticks(rotation=45, ha="right")
+st.pyplot(fig)
+
+# Download option
+st.subheader("Download Data")
 csv = df.to_csv(index=False).encode('utf-8')
-st.download_button(
-    label="Download Data as CSV",
-    data=csv,
-    file_name='CRF_Facility_Data.csv',
-    mime='text/csv',
-)
+st.download_button(label="Download Data as CSV", data=csv, file_name='CRF_Facility_Data.csv', mime='text/csv')
