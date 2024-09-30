@@ -65,7 +65,7 @@ st.download_button(
     data=df.to_csv(index=False),
     file_name='CRF_Vacancy_Control_Data.csv',
     mime='text/csv'
-)
+
 # Sample Data extracted from the CRF Vacancy Control Dashboards
 data = {
     "Facility": [
