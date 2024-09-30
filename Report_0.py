@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 
-# Sample data extracted from the CRF Vacancy Control Dashboards
+# Sample data extracted from the CRF Vacancy Control Dashboards with Cribs
 data = {
     "Facility": [
         "Icahn House", "House East", "Hope House", "Kenilworth", 
@@ -16,7 +16,8 @@ data = {
     "Units Under Repair": [2, 1, 2, 2, 0, 1, 1, 0, 0, 3, 0, 2, 0],
     "Units in Long-Term Repair": [1, 3, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0],
     "Units Offline": [10, 8, 8, 2, 1, 5, 3, 0, 31, 6, 8, 8, 0],
-    "Occupancy Rate (%)": [85, 96, 84, 99, 99, 94, 93, 100, 87, 94, 92, 93, 100]
+    "Occupancy Rate (%)": [85, 96, 84, 99, 99, 94, 93, 100, 87, 94, 92, 93, 100],
+    "Cribs": [10, 20, 5, 15, 7, 9, 4, 2, 12, 6, 10, 8, 5]
 }
 
 # Convert data to DataFrame
@@ -57,7 +58,7 @@ plt.title("Occupied Units vs Offline Units by Facility")
 plt.xlabel("Number of Units")
 plt.ylabel("Facility")
 st.pyplot(fig)
-st.write(df[["Facility", "Total Units", "Units Offline"]])
+st.write(df[["Facility", "Total Units", "Units Offline", "Cribs"]])
 
 # Summary of Occupied vs Offline Units
 st.markdown("""
@@ -74,13 +75,14 @@ plt.title("Facility-Level Unit Status")
 plt.ylabel("Number of Units")
 plt.xticks(rotation=45, ha="right")
 st.pyplot(fig)
-st.write(df[["Facility", "Available Units", "Reserved Units", "Units in Maintenance", "Units Under Repair", "Units Offline"]])
+st.write(df[["Facility", "Available Units", "Reserved Units", "Units in Maintenance", "Units Under Repair", "Units Offline", "Cribs"]])
 
 # Summary of Unit Availability
 st.markdown("""
 **Summary of Unit Availability**:  
 - **Light House** has the highest number of available units (22), while **Kenilworth** and **Lenox** have no available units. 
 - **Light House** and **Comfort Inn** have the most units offline, which may affect service availability.
+- In terms of cribs, **House East** has the largest number (20), which could indicate a higher demand for family services.
 """)
 
 # Detailed Units in Maintenance or Repair
@@ -91,7 +93,7 @@ plt.title("Detailed Units in Maintenance or Repair")
 plt.ylabel("Number of Units")
 plt.xticks(rotation=45, ha="right")
 st.pyplot(fig)
-st.write(df[["Facility", "Units in Maintenance", "Units Under Repair", "Units in Long-Term Repair"]])
+st.write(df[["Facility", "Units in Maintenance", "Units Under Repair", "Units in Long-Term Repair", "Cribs"]])
 
 # Summary of Units in Maintenance or Repair
 st.markdown("""
@@ -108,7 +110,7 @@ plt.title("Facility Performance Comparison")
 plt.ylabel("Metrics")
 plt.xticks(rotation=45, ha="right")
 st.pyplot(fig)
-st.write(df[["Facility", "Occupancy Rate (%)", "Units Offline", "Units Under Repair"]])
+st.write(df[["Facility", "Occupancy Rate (%)", "Units Offline", "Units Under Repair", "Cribs"]])
 
 # Summary of Facility Performance
 st.markdown("""
@@ -128,7 +130,7 @@ plt.xlim(0, 100)
 for index, value in enumerate(df["Occupancy Efficiency (%)"]):
     plt.text(value + 1, index, f"{value:.1f}%", va='center')
 st.pyplot(fig)
-st.write(df[["Facility", "Occupancy Efficiency (%)"]])
+st.write(df[["Facility", "Occupancy Efficiency (%)", "Cribs"]])
 
 # Summary of Occupancy Efficiency
 st.markdown("""
