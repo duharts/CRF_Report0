@@ -55,7 +55,7 @@ if metrics:
 # Business Summary for Comparison Chart
 st.markdown("""
 **Business Summary**:  
-This chart compares the **Occupancy Rate** and **Units Offline**. High occupancy rates at **Lenox** and **Kenilworth** show optimal utilization, whereas **Light House** and **Comfort Inn** have more offline units that impact their performance.
+This chart shows **occupancy rate** and **units offline** across facilities. Facilities like **Lenox** and **Kenilworth** perform optimally, while **Hope House** and **Comfort Inn** struggle with higher offline units.
 """)
 
 ### 1. **Turnover Time Analysis**
@@ -67,7 +67,7 @@ st.plotly_chart(fig_turnover)
 
 st.markdown("""
 **Business Summary**:  
-Facilities like **Light House** and **Park Overlook** experience longer turnover times, indicating potential repair or operational delays. **Icahn House** demonstrates faster unit turnover, contributing to more efficient operations.
+Facilities such as **Light House** and **Park Overlook** show extended turnover times, which may suggest bottlenecks in repair processes. **Icahn House** has the shortest turnover, indicating faster unit cycling.
 """)
 
 ### 2. **Crib Utilization Rate**
@@ -82,7 +82,7 @@ st.plotly_chart(fig_crib)
 
 st.markdown("""
 **Business Summary**:  
-**House East** and **Light House** have higher crib utilization, indicating a higher proportion of units designated for family use. Monitoring crib availability in these facilities can help balance supply and demand.
+Crib utilization is highest at **House East** and **Light House**, which indicates that these facilities may need additional cribs to meet demand.
 """)
 
 ### 3. **Days Offline Analysis**
@@ -94,7 +94,7 @@ st.plotly_chart(fig_days_offline)
 
 st.markdown("""
 **Business Summary**:  
-**Light House** shows the highest number of days offline, which may negatively impact occupancy rates. Efficient repairs and reducing downtime can improve this facility's operational capacity.
+**Light House** has the highest number of days offline, which significantly impacts its overall efficiency. Reducing these downtime periods can help improve occupancy rates.
 """)
 
 ### 4. **Occupancy and Cribs Comparison**
@@ -106,7 +106,7 @@ st.plotly_chart(fig_occupancy_cribs)
 
 st.markdown("""
 **Business Summary**:  
-The facilities with higher crib counts, such as **Light House** and **House East**, tend to accommodate more families with young children. This comparison helps in managing family-oriented housing resources effectively.
+Comparing total units and cribs reveals that **Light House** and **House East** serve more families with young children, as they allocate a higher percentage of total units for cribs.
 """)
 
 ### Existing Matplotlib Plots and Business Summaries:
@@ -125,7 +125,7 @@ st.pyplot(fig)
 
 st.markdown("""
 **Business Summary**:  
-Occupancy rates remain strong across most facilities, with **Lenox** and **Kenilworth** achieving 100%. **Hope House** and **Best Western** could increase occupancy rates with targeted interventions.
+Most facilities maintain an occupancy rate above 90%, indicating strong utilization. **Hope House** and **Best Western** are areas of opportunity for improvement.
 """)
 
 # Efficiency Metric (Matplotlib)
@@ -142,7 +142,7 @@ st.pyplot(fig)
 
 st.markdown("""
 **Business Summary**:  
-**Kenilworth** and **Lenox** are operating at full efficiency, while **Light House** struggles due to a high number of offline units, lowering overall efficiency. Improving unit availability can enhance performance.
+Facilities like **Kenilworth** and **Lenox** show 100% efficiency, utilizing all available units. **Light House** lags behind due to significant offline units.
 """)
 
 # Download option
