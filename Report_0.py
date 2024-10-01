@@ -42,55 +42,94 @@ st.title("CRF Vacancy Control Dashboard with Enhanced Metrics")
 st.subheader("Facility Data Overview")
 st.write(df)
 
-# Business Summary for Table
+# Executive Summary for Table
 st.markdown("""
-**Business Summary**:  
-The table above shows additional metrics such as **Revenue Lost Due to Offline Units**, **Repair Costs**, and **Crib Utilization**. **Hope House** and **Light House** show the highest offline unit costs, indicating the need for operational improvements.
+**Executive Summary**:  
+This table presents the core operational data for each facility. **Hope House** and **Light House** show the highest revenue losses due to offline units, indicating a need for operational improvements. **Kenilworth** and **Lenox** exhibit strong performance with high occupancy rates and no offline units.
 """)
 
-# Function to plot comparison chart
-def plot_comparison_chart(metrics):
-    fig, ax = plt.subplots()
-    df.set_index("Facility")[metrics].plot(kind="bar", ax=ax)
-    plt.title(f"Comparison of Metrics: {', '.join(metrics)}")
-    plt.ylabel("Values")
-    plt.xticks(rotation=45, ha="right")
-    st.pyplot(fig)
+# Revenue Lost Due to Offline Units
+st.subheader("Revenue Lost Due to Offline Units")
+fig_rev_lost = plt.figure()
+df.set_index("Facility")["Revenue Lost Due to Offline Units"].plot(kind="bar", color="red")
+plt.title("Revenue Lost Due to Offline Units by Facility")
+plt.xlabel("Facility")
+plt.ylabel("Revenue Lost ($)")
+st.pyplot(fig_rev_lost)
 
-# Multiselect for choosing metrics to compare
-st.subheader("Choose Metrics to Compare")
-metrics = st.multiselect(
-    "Select Metrics for Comparison",
-    options=df.columns.drop("Facility"),  # Exclude Facility column
-    default=["Occupancy Rate (%)", "Units Offline", "Revenue Lost Due to Offline Units", "Repair Costs ($)", "Crib Utilization (%)"]
-)
-
-# Display comparison chart
-if metrics:
-    plot_comparison_chart(metrics)
-
-# Business Summary for Comparison Chart
 st.markdown("""
-**Business Summary**:  
-This comparison highlights the revenue loss due to offline units and repair costs. Facilities like **Light House** and **Hope House** have significant losses that should be addressed to improve financial performance.
+**Executive Summary**:  
+The graph highlights significant revenue losses at **Hope House** and **Light House**, which suffer from prolonged downtime. Addressing the causes of offline units could recover substantial lost revenue.
 """)
 
-# Occupancy Rate Overview (Matplotlib)
-st.subheader("1. Occupancy Rate Overview")
-fig, ax = plt.subplots()
-df.set_index("Facility")["Occupancy Rate (%)"].plot(kind="barh", color="#1f77b4", ax=ax)
+# Repair Costs
+st.subheader("Repair Costs")
+fig_repair = plt.figure()
+df.set_index("Facility")["Repair Costs ($)"].plot(kind="bar", color="orange")
+plt.title("Repair Costs by Facility")
+plt.xlabel("Facility")
+plt.ylabel("Repair Costs ($)")
+st.pyplot(fig_repair)
+
+st.markdown("""
+**Executive Summary**:  
+**Light House** and **Hope House** incur the highest repair costs due to offline units, making a case for preventive maintenance programs. Facilities with lower repair costs, such as **Kenilworth** and **Lenox**, can focus on maintaining their strong performance.
+""")
+
+# Crib Utilization Rate
+st.subheader("Crib Utilization Rate")
+fig_crib_util = plt.figure()
+df.set_index("Facility")["Crib Utilization (%)"].plot(kind="bar", color="green")
+plt.title("Crib Utilization Rate by Facility")
+plt.xlabel("Facility")
+plt.ylabel("Crib Utilization (%)")
+st.pyplot(fig_crib_util)
+
+st.markdown("""
+**Executive Summary**:  
+**House East** and **Light House** exhibit high crib utilization rates, indicating that these facilities serve a higher percentage of families. Ensuring crib availability can help maintain this demand.
+""")
+
+# Occupancy Rate
+st.subheader("Occupancy Rate")
+fig_occ_rate = plt.figure()
+df.set_index("Facility")["Occupancy Rate (%)"].plot(kind="bar", color="blue")
 plt.title("Occupancy Rate by Facility")
-plt.xlabel("Occupancy Rate (%)")
-plt.ylabel("Facility")
-plt.xlim(0, 100)
-for index, value in enumerate(df["Occupancy Rate (%)"]):
-    plt.text(value + 1, index, f"{value}%", va='center')
-st.pyplot(fig)
+plt.xlabel("Facility")
+plt.ylabel("Occupancy Rate (%)")
+st.pyplot(fig_occ_rate)
 
-# Business Summary for Occupancy Rate
 st.markdown("""
-**Business Summary**:  
-Occupancy rates across most facilities are efficient, with **Kenilworth** and **Park Overlook Stabilization** leading. **Hope House** shows room for improvement with an 84% occupancy rate.
+**Executive Summary**:  
+**Kenilworth** and **Lenox** maintain full occupancy, showcasing optimal efficiency. **Hope House** and **Light House** have lower occupancy rates, indicating potential inefficiencies that can be addressed to improve utilization.
+""")
+
+# Return to Full Capacity
+st.subheader("Return to Full Capacity")
+fig_return_full = plt.figure()
+df.set_index("Facility")["Return to Full Capacity (Days)"].plot(kind="bar", color="purple")
+plt.title("Estimated Days to Return to Full Capacity by Facility")
+plt.xlabel("Facility")
+plt.ylabel("Return to Full Capacity (Days)")
+st.pyplot(fig_return_full)
+
+st.markdown("""
+**Executive Summary**:  
+**Light House** and **Hope House** will require longer periods to return to full capacity due to a significant number of offline units. Facilities with faster return times, like **Kenilworth**, demonstrate more efficient turnaround for repairs and availability.
+""")
+
+# Occupancy Efficiency Metric
+st.subheader("Occupancy Efficiency")
+fig_efficiency = plt.figure()
+df.set_index("Facility")["Occupancy Efficiency (%)"].plot(kind="bar", color="#d62728")
+plt.title("Occupancy Efficiency by Facility")
+plt.xlabel("Facility")
+plt.ylabel("Occupancy Efficiency (%)")
+st.pyplot(fig_efficiency)
+
+st.markdown("""
+**Executive Summary**:  
+**Kenilworth** and **Lenox** are operating at full capacity, whereas **Light House** and **Comfort Inn** face inefficiencies due to offline units. Improving repair processes and minimizing downtime can enhance occupancy efficiency.
 """)
 
 # Download option
