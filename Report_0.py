@@ -1,8 +1,21 @@
 import streamlit as st
 import pandas as pd
+import plotly.express as px
 import matplotlib.pyplot as plt
 
-# Updated data with daily pay rates for specific facilities
+# Add and center the logo
+logo_url = "https://th.bing.com/th/id/OIP.gEfQtRo5_UR48_2Ms_Ag8wAAAA?w=275&h=180&c=7&r=0&o=5&dpr=1.8&pid=1.7"
+
+st.markdown(
+    f"""
+    <div style='text-align: center;'>
+        <img src="{logo_url}" alt="Logo" width="200"/>
+    </div>
+    """, 
+    unsafe_allow_html=True
+)
+
+# Sample data extracted from the CRF Vacancy Control Dashboards
 data = {
     "Facility": [
         "Icahn House", "House East", "Hope House", "Kenilworth", 
@@ -12,124 +25,115 @@ data = {
     "Total Units": [65, 192, 51, 200, 91, 83, 43, 41, 240, 101, 101, 113, 130],
     "Available Units": [3, 1, 5, 0, 1, 4, 2, 0, 22, 1, 2, 4, 0],
     "Reserved Units": [0, 3, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
+    "Units in Maintenance": [0, 0, 0, 0, 0, 0, 0, 0, 6, 1, 1, 0, 0],
+    "Units Under Repair": [2, 1, 2, 2, 0, 1, 1, 0, 0, 3, 0, 2, 0],
+    "Units in Long-Term Repair": [1, 3, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0],
     "Units Offline": [10, 8, 8, 2, 1, 5, 3, 0, 31, 6, 8, 8, 0],
     "Occupancy Rate (%)": [85, 96, 84, 99, 99, 94, 93, 100, 87, 94, 92, 93, 100],
     "Cribs": [10, 20, 5, 15, 7, 9, 4, 2, 12, 6, 10, 8, 5],
     "Days Offline": [5, 8, 10, 12, 2, 14, 7, 5, 25, 6, 12, 10, 0],
-    "Daily Rate ($)": [122.22, 154.60, 227, 230, 210, 125, 125, 240, 250, 224.40, 224.40, 220, 235]
+    "Status": ["Under Repair", "Maintenance", "Available", "Maintenance", "Repair", "Repair", "Repair", "Available", "Maintenance", "Repair", "Available", "Maintenance", "Available"]
 }
 
 # Convert data to DataFrame
 df = pd.DataFrame(data)
 
-# Add new metrics
-df['Revenue Lost Due to Offline Units'] = df['Units Offline'] * df['Daily Rate ($)'] * df['Days Offline']
-
-# Assumed average repair cost per unit
-average_repair_cost = 500
-df['Repair Costs ($)'] = df['Units Offline'] * average_repair_cost
-
-# Crib Utilization Rate
-df['Crib Utilization (%)'] = (df['Cribs'] / df['Total Units']) * 100
-
-# Time to Return to Full Capacity (estimated in days)
-df['Return to Full Capacity (Days)'] = df['Units Offline'] / (df['Total Units'] - df['Units Offline']) * 100
+# Add an Efficiency Metric: Occupied Units / Total Units * 100
+df['Occupancy Efficiency (%)'] = (df["Total Units"] - df["Units Offline"]) / df["Total Units"] * 100
 
 # Streamlit App Title
-st.title("CRF Vacancy Control Dashboard with Enhanced Metrics")
+st.title("Sample Vacancy Control Dashboard")
 
-# Display the raw data as a table
-st.subheader("Facility Data Overview")
-st.write(df)
+# Plotly Stacked Bar Chart for Comparison
+def plot_comparison_chart(metrics):
+    df_melted = df.melt(id_vars="Facility", value_vars=metrics, var_name="Metric", value_name="Value")
+    fig = px.bar(df_melted, x="Facility", y="Value", color="Metric", barmode="stack", text_auto='.2s',
+                 title="Comparison of Metrics", height=400)
+    fig.update_layout(xaxis_tickangle=-45)
+    st.plotly_chart(fig)
 
-# Executive Summary for Table
+# Multiselect for choosing metrics to compare
+st.subheader("Choose Metrics to Compare")
+metrics = st.multiselect(
+    "Select Metrics for Comparison",
+    options=df.columns.drop("Facility"),  # Exclude Facility column
+    default=["Occupancy Rate (%)", "Units Offline"]
+)
+
+# Display comparison chart
+if metrics:
+    plot_comparison_chart(metrics)
+
+# Business Summary for Comparison Chart
 st.markdown("""
-**Executive Summary**:  
-This table presents the core operational data for each facility. **Hope House** and **Light House** show the highest revenue losses due to offline units, indicating a need for operational improvements. **Kenilworth** and **Lenox** exhibit strong performance with high occupancy rates and no offline units.
+**Business Summary**:  
+This chart shows **occupancy rate** and **units offline** across facilities. Facilities like **Lenox** and **Kenilworth** perform optimally, while **Hope House** and **Comfort Inn** struggle with higher offline units.
 """)
 
-# Revenue Lost Due to Offline Units
-st.subheader("Revenue Lost Due to Offline Units")
-fig_rev_lost = plt.figure()
-df.set_index("Facility")["Revenue Lost Due to Offline Units"].plot(kind="bar", color="red")
-plt.title("Revenue Lost Due to Offline Units by Facility")
-plt.xlabel("Facility")
-plt.ylabel("Revenue Lost ($)")
-st.pyplot(fig_rev_lost)
-
-st.markdown("""
-**Executive Summary**:  
-The graph highlights significant revenue losses at **Hope House** and **Light House**, which suffer from prolonged downtime. Addressing the causes of offline units could recover substantial lost revenue.
-""")
-
-# Repair Costs
-st.subheader("Repair Costs")
-fig_repair = plt.figure()
-df.set_index("Facility")["Repair Costs ($)"].plot(kind="bar", color="orange")
-plt.title("Repair Costs by Facility")
-plt.xlabel("Facility")
-plt.ylabel("Repair Costs ($)")
-st.pyplot(fig_repair)
-
-st.markdown("""
-**Executive Summary**:  
-**Light House** and **Hope House** incur the highest repair costs due to offline units, making a case for preventive maintenance programs. Facilities with lower repair costs, such as **Kenilworth** and **Lenox**, can focus on maintaining their strong performance.
-""")
-
-# Crib Utilization Rate
-st.subheader("Crib Utilization Rate")
-fig_crib_util = plt.figure()
-df.set_index("Facility")["Crib Utilization (%)"].plot(kind="bar", color="green")
-plt.title("Crib Utilization Rate by Facility")
-plt.xlabel("Facility")
-plt.ylabel("Crib Utilization (%)")
-st.pyplot(fig_crib_util)
-
-st.markdown("""
-**Executive Summary**:  
-**House East** and **Light House** exhibit high crib utilization rates, indicating that these facilities serve a higher percentage of families. Ensuring crib availability can help maintain this demand.
-""")
-
-# Occupancy Rate
-st.subheader("Occupancy Rate")
-fig_occ_rate = plt.figure()
-df.set_index("Facility")["Occupancy Rate (%)"].plot(kind="bar", color="blue")
+# Occupancy Rate Overview (Matplotlib)
+st.subheader("1. Occupancy Rate Overview")
+fig, ax = plt.subplots()
+df.set_index("Facility")["Occupancy Rate (%)"].plot(kind="barh", color="#1f77b4", ax=ax)
 plt.title("Occupancy Rate by Facility")
-plt.xlabel("Facility")
-plt.ylabel("Occupancy Rate (%)")
-st.pyplot(fig_occ_rate)
+plt.xlabel("Occupancy Rate (%)")
+plt.ylabel("Facility")
+plt.xlim(0, 100)
+for index, value in enumerate(df["Occupancy Rate (%)"]):
+    plt.text(value + 1, index, f"{value}%", va='center')
+st.pyplot(fig)
 
+# Business Summary for Occupancy Rate
 st.markdown("""
-**Executive Summary**:  
-**Kenilworth** and **Lenox** maintain full occupancy, showcasing optimal efficiency. **Hope House** and **Light House** have lower occupancy rates, indicating potential inefficiencies that can be addressed to improve utilization.
+**Business Summary**:  
+Most facilities have an occupancy rate above 90%, showing strong utilization. **Hope House** and **Best Western** could increase occupancy to match the performance of top facilities like **Lenox**.
 """)
 
-# Return to Full Capacity
-st.subheader("Return to Full Capacity")
-fig_return_full = plt.figure()
-df.set_index("Facility")["Return to Full Capacity (Days)"].plot(kind="bar", color="purple")
-plt.title("Estimated Days to Return to Full Capacity by Facility")
-plt.xlabel("Facility")
-plt.ylabel("Return to Full Capacity (Days)")
-st.pyplot(fig_return_full)
+# Days Offline and Unit Status (Matplotlib)
+st.subheader("2. Days Offline and Unit Status")
+fig, ax = plt.subplots()
+df.set_index("Facility")[["Days Offline", "Units Offline"]].plot(kind="bar", stacked=True, color=['#ff7f0e', '#2ca02c'], ax=ax)
+plt.title("Days Offline vs Units Offline")
+plt.ylabel("Days/Units")
+plt.xticks(rotation=45, ha="right")
+st.pyplot(fig)
 
+# Business Summary for Days Offline and Status
 st.markdown("""
-**Executive Summary**:  
-**Light House** and **Hope House** will require longer periods to return to full capacity due to a significant number of offline units. Facilities with faster return times, like **Kenilworth**, demonstrate more efficient turnaround for repairs and availability.
+**Business Summary**:  
+**Light House** and **Comfort Inn** have long periods of offline units, likely due to maintenance issues. Addressing these quickly could reduce downtime and improve efficiency.
 """)
 
-# Occupancy Efficiency Metric
-st.subheader("Occupancy Efficiency")
-fig_efficiency = plt.figure()
-df.set_index("Facility")["Occupancy Efficiency (%)"].plot(kind="bar", color="#d62728")
+# Facility Performance Comparison (Matplotlib)
+st.subheader("3. Facility Performance Comparison")
+fig, ax = plt.subplots()
+df.set_index("Facility")[["Occupancy Rate (%)", "Units Offline", "Units Under Repair"]].plot(kind="bar", ax=ax)
+plt.title("Facility Performance Comparison")
+plt.ylabel("Metrics")
+plt.xticks(rotation=45, ha="right")
+st.pyplot(fig)
+
+# Business Summary for Facility Performance
+st.markdown("""
+**Business Summary**:  
+Facilities like **Ellington** and **Apollo** show strong performance with high occupancy rates and minimal offline units, while **Light House** and **Hope House** need improvements.
+""")
+
+# Efficiency Metric (Matplotlib)
+st.subheader("4. Occupancy Efficiency Metric")
+fig, ax = plt.subplots()
+df.set_index("Facility")["Occupancy Efficiency (%)"].plot(kind="barh", color="#d62728", ax=ax)
 plt.title("Occupancy Efficiency by Facility")
-plt.xlabel("Facility")
-plt.ylabel("Occupancy Efficiency (%)")
-st.pyplot(fig_efficiency)
+plt.xlabel("Occupancy Efficiency (%)")
+plt.ylabel("Facility")
+plt.xlim(0, 100)
+for index, value in enumerate(df["Occupancy Efficiency (%)"]):
+    plt.text(value + 1, index, f"{value:.1f}%", va='center')
+st.pyplot(fig)
 
+# Business Summary for Occupancy Efficiency
 st.markdown("""
-**Executive Summary**:  
-**Kenilworth** and **Lenox** are operating at full capacity, whereas **Light House** and **Comfort Inn** face inefficiencies due to offline units. Improving repair processes and minimizing downtime can enhance occupancy efficiency.
+**Business Summary**:  
+**Kenilworth** and **Lenox** operate at full capacity, showing 100% efficiency. However, **Light House** and **Comfort Inn** suffer from low efficiency due to offline units.
 """)
 
 # Download option
