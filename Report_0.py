@@ -3,6 +3,18 @@ import pandas as pd
 import plotly.express as px
 import matplotlib.pyplot as plt
 
+# Add and center the logo
+logo_url = "https://th.bing.com/th/id/OIP.gEfQtRo5_UR48_2Ms_Ag8wAAAA?w=275&h=180&c=7&r=0&o=5&dpr=1.8&pid=1.7"
+
+st.markdown(
+    f"""
+    <div style='text-align: center;'>
+        <img src="{logo_url}" alt="Logo" width="200"/>
+    </div>
+    """, 
+    unsafe_allow_html=True
+)
+
 # Sample data extracted from the CRF Vacancy Control Dashboards
 data = {
     "Facility": [
