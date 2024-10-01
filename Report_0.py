@@ -140,3 +140,25 @@ st.markdown("""
 st.subheader("Download Data")
 csv = df.to_csv(index=False).encode('utf-8')
 st.download_button(label="Download Data as CSV", data=csv, file_name='CRF_Facility_Data.csv', mime='text/csv')
+
+# Add footer to Streamlit app
+st.markdown(
+    """
+    <style>
+    .footer {
+        position: fixed;
+        left: 0;
+        bottom: 0;
+        width: 100%;
+        background-color: lightgrey;
+        color: black;
+        text-align: center;
+        padding: 10px;
+    }
+    </style>
+    <div class="footer">
+        <p><strong>CRF INTERNAL ONLY 2024</strong></p>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
