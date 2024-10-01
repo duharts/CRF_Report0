@@ -29,12 +29,8 @@ df = pd.DataFrame(data)
 # Add an Efficiency Metric: Occupied Units / Total Units * 100
 df['Occupancy Efficiency (%)'] = (df["Total Units"] - df["Units Offline"]) / df["Total Units"] * 100
 
-# Add Daily Rate for Hope House
-daily_rate_hope_house = 227  # $227 per day for Hope House
-df['Daily Cost Impact (Hope House)'] = df['Units Offline'] * daily_rate_hope_house * df['Days Offline']  # Calculating cost impact for Hope House
-
 # Streamlit App Title
-st.title("CRF Vacancy Control Dashboard with Cost Analysis and Business Summaries")
+st.title("CRF Vacancy Control Dashboard with Expanded Analysis and Business Summaries")
 
 # Plotly Stacked Bar Chart for Comparison
 def plot_comparison_chart(metrics):
@@ -62,22 +58,61 @@ st.markdown("""
 This chart compares the **Occupancy Rate** and **Units Offline**. High occupancy rates at **Lenox** and **Kenilworth** show optimal utilization, whereas **Light House** and **Comfort Inn** have more offline units that impact their performance.
 """)
 
-### Cost Impact Analysis for Hope House
-st.subheader("Cost Impact Analysis for Hope House")
-fig_cost = px.bar(df[df["Facility"] == "Hope House"], x="Facility", y="Daily Cost Impact (Hope House)", text="Daily Cost Impact (Hope House)",
-                  title="Cost Impact Due to Offline Units at Hope House")
-fig_cost.update_layout(xaxis_tickangle=-45)
-st.plotly_chart(fig_cost)
+### 1. **Turnover Time Analysis**
+st.subheader("1. Turnover Time Analysis")
+fig_turnover = px.bar(df, x="Facility", y="Turnover Time (days)", color="Turnover Time (days)", text_auto=True,
+                      title="Turnover Time by Facility")
+fig_turnover.update_layout(xaxis_tickangle=-45)
+st.plotly_chart(fig_turnover)
 
 st.markdown("""
 **Business Summary**:  
-The offline units at **Hope House** have a significant cost impact, with a daily rate of $227 per day. The more units that remain offline, the more revenue is lost. Strategies to minimize offline units will help reduce the cost impact.
+Facilities like **Light House** and **Park Overlook** experience longer turnover times, indicating potential repair or operational delays. **Icahn House** demonstrates faster unit turnover, contributing to more efficient operations.
+""")
+
+### 2. **Crib Utilization Rate**
+st.subheader("2. Crib Utilization Rate")
+crib_utilization = (df["Cribs"] / df["Total Units"]) * 100
+df["Crib Utilization (%)"] = crib_utilization
+
+fig_crib = px.bar(df, x="Facility", y="Crib Utilization (%)", text="Crib Utilization (%)",
+                  title="Crib Utilization Rate by Facility")
+fig_crib.update_layout(xaxis_tickangle=-45)
+st.plotly_chart(fig_crib)
+
+st.markdown("""
+**Business Summary**:  
+**House East** and **Light House** have higher crib utilization, indicating a higher proportion of units designated for family use. Monitoring crib availability in these facilities can help balance supply and demand.
+""")
+
+### 3. **Days Offline Analysis**
+st.subheader("3. Days Offline Analysis")
+fig_days_offline = px.bar(df, x="Facility", y="Days Offline", text="Days Offline",
+                          title="Days Offline by Facility", color="Days Offline")
+fig_days_offline.update_layout(xaxis_tickangle=-45)
+st.plotly_chart(fig_days_offline)
+
+st.markdown("""
+**Business Summary**:  
+**Light House** shows the highest number of days offline, which may negatively impact occupancy rates. Efficient repairs and reducing downtime can improve this facility's operational capacity.
+""")
+
+### 4. **Occupancy and Cribs Comparison**
+st.subheader("4. Occupancy and Cribs Comparison")
+fig_occupancy_cribs = px.bar(df, x="Facility", y=["Total Units", "Cribs"], barmode="group", text_auto=True,
+                             title="Occupancy vs Cribs by Facility")
+fig_occupancy_cribs.update_layout(xaxis_tickangle=-45)
+st.plotly_chart(fig_occupancy_cribs)
+
+st.markdown("""
+**Business Summary**:  
+The facilities with higher crib counts, such as **Light House** and **House East**, tend to accommodate more families with young children. This comparison helps in managing family-oriented housing resources effectively.
 """)
 
 ### Existing Matplotlib Plots and Business Summaries:
 
 # Occupancy Rate Overview (Matplotlib)
-st.subheader("Occupancy Rate Overview")
+st.subheader("5. Occupancy Rate Overview")
 fig, ax = plt.subplots()
 df.set_index("Facility")["Occupancy Rate (%)"].plot(kind="barh", color="#1f77b4", ax=ax)
 plt.title("Occupancy Rate by Facility")
@@ -94,7 +129,7 @@ Occupancy rates remain strong across most facilities, with **Lenox** and **Kenil
 """)
 
 # Efficiency Metric (Matplotlib)
-st.subheader("Occupancy Efficiency Metric")
+st.subheader("6. Occupancy Efficiency Metric")
 fig, ax = plt.subplots()
 df.set_index("Facility")["Occupancy Efficiency (%)"].plot(kind="barh", color="#d62728", ax=ax)
 plt.title("Occupancy Efficiency by Facility")
