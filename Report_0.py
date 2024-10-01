@@ -70,6 +70,23 @@ st.markdown("""
 This chart shows **occupancy rate** and **units offline** across facilities. Facilities like **Lenox** and **Kenilworth** perform optimally, while **Hope House** and **Comfort Inn** struggle with higher offline units.
 """)
 
+# Function to center tables
+def center_table(table_df):
+    st.markdown(
+        """
+        <style>
+        .center-table {
+            display: flex;
+            justify-content: center;
+        }
+        </style>
+        """, 
+        unsafe_allow_html=True
+    )
+    st.markdown("<div class='center-table'>", unsafe_allow_html=True)
+    st.write(table_df)
+    st.markdown("</div>", unsafe_allow_html=True)
+
 # Occupancy Rate Overview (Matplotlib)
 st.subheader("1. Occupancy Rate Overview")
 fig, ax = plt.subplots()
@@ -82,8 +99,8 @@ for index, value in enumerate(df["Occupancy Rate (%)"]):
     plt.text(value + 1, index, f"{value}%", va='center')
 st.pyplot(fig)
 
-# Display the table for Occupancy Rate
-st.write(df[['Facility', 'Occupancy Rate (%)']])
+# Display the table for Occupancy Rate (centered)
+center_table(df[['Facility', 'Occupancy Rate (%)']])
 
 # Business Summary for Occupancy Rate
 st.markdown("""
@@ -100,8 +117,8 @@ plt.ylabel("Days/Units")
 plt.xticks(rotation=45, ha="right")
 st.pyplot(fig)
 
-# Display the table for Days Offline and Units Offline
-st.write(df[['Facility', 'Days Offline', 'Units Offline']])
+# Display the table for Days Offline and Units Offline (centered)
+center_table(df[['Facility', 'Days Offline', 'Units Offline']])
 
 # Business Summary for Days Offline and Status
 st.markdown("""
@@ -118,8 +135,8 @@ plt.ylabel("Metrics")
 plt.xticks(rotation=45, ha="right")
 st.pyplot(fig)
 
-# Display the table for Facility Performance
-st.write(df[['Facility', 'Occupancy Rate (%)', 'Units Offline', 'Units Under Repair']])
+# Display the table for Facility Performance (centered)
+center_table(df[['Facility', 'Occupancy Rate (%)', 'Units Offline', 'Units Under Repair']])
 
 # Business Summary for Facility Performance
 st.markdown("""
@@ -139,8 +156,8 @@ for index, value in enumerate(df["Occupancy Efficiency (%)"]):
     plt.text(value + 1, index, f"{value:.1f}%", va='center')
 st.pyplot(fig)
 
-# Display the table for Occupancy Efficiency
-st.write(df[['Facility', 'Occupancy Efficiency (%)']])
+# Display the table for Occupancy Efficiency (centered)
+center_table(df[['Facility', 'Occupancy Efficiency (%)']])
 
 # Business Summary for Occupancy Efficiency
 st.markdown("""
