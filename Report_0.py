@@ -84,7 +84,7 @@ def center_table(table_df):
         unsafe_allow_html=True
     )
     st.markdown("<div class='center-table'>", unsafe_allow_html=True)
-    st.write(table_df)
+    st.dataframe(table_df)
     st.markdown("</div>", unsafe_allow_html=True)
 
 # Occupancy Rate Overview (Matplotlib)
