@@ -20,10 +20,7 @@ data = {
     "Occupancy Rate (%)": [85, 96, 84, 99, 99, 94, 93, 100, 87, 94, 92, 93, 100],
     "Cribs": [10, 20, 5, 15, 7, 9, 4, 2, 12, 6, 10, 8, 5],
     "Days Offline": [5, 8, 10, 12, 2, 14, 7, 5, 25, 6, 12, 10, 0],
-    "Status": ["Under Repair", "Maintenance", "Available", "Maintenance", "Repair", "Repair", "Repair", "Available", "Maintenance", "Repair", "Available", "Maintenance", "Available"],
-    "Details (Repairs Needed)": ["Plumbing", "Electrical", "Ready", "HVAC", "Roof", "Extermination", "Flooring", "Paint", "Renovation", "Fumigation", "Ready", "Structural", "Ready"],
-    "Expected Date": ["2024-09-20", "2024-09-18", "N/A", "2024-09-22", "2024-09-25", "2024-09-30", "2024-09-23", "N/A", "2024-09-30", "2024-09-26", "N/A", "2024-09-30", "N/A"],
-    "Time of Turnover": ["5:00 PM", "3:00 PM", "N/A", "4:00 PM", "2:00 PM", "5:00 PM", "12:00 PM", "N/A", "1:00 PM", "5:00 PM", "N/A", "6:00 PM", "N/A"]
+    "Status": ["Under Repair", "Maintenance", "Available", "Maintenance", "Repair", "Repair", "Repair", "Available", "Maintenance", "Repair", "Available", "Maintenance", "Available"]
 }
 
 # Convert data to DataFrame
@@ -33,13 +30,13 @@ df = pd.DataFrame(data)
 df['Occupancy Efficiency (%)'] = (df["Total Units"] - df["Units Offline"]) / df["Total Units"] * 100
 
 # Streamlit App Title
-st.title("CRF Vacancy Control Dashboard with Metric Comparison")
+st.title("CRF Vacancy Control Dashboard with Metric Comparison and Business Summaries")
 
-# Updated Plotly Comparison Chart
+# Plotly Stacked Bar Chart for Comparison
 def plot_comparison_chart(metrics):
     df_melted = df.melt(id_vars="Facility", value_vars=metrics, var_name="Metric", value_name="Value")
-    fig = px.bar(df_melted, x="Facility", y="Value", color="Metric",
-                 title="Comparison of Metrics", barmode="stack", text_auto='.2s')
+    fig = px.bar(df_melted, x="Facility", y="Value", color="Metric", barmode="stack", text_auto='.2s',
+                 title="Comparison of Metrics", height=400)
     fig.update_layout(xaxis_tickangle=-45)
     st.plotly_chart(fig)
 
@@ -48,14 +45,20 @@ st.subheader("Choose Metrics to Compare")
 metrics = st.multiselect(
     "Select Metrics for Comparison",
     options=df.columns.drop("Facility"),  # Exclude Facility column
-    default=["Occupancy Rate (%)", "Units Offline"]  # Preselect common metrics
+    default=["Occupancy Rate (%)", "Units Offline"]
 )
 
 # Display comparison chart
 if metrics:
     plot_comparison_chart(metrics)
 
-# Sleeker Occupancy Rate Overview (Matplotlib)
+# Business Summary for Comparison Chart
+st.markdown("""
+**Business Summary**:  
+This chart shows **occupancy rate** and **units offline** across facilities. Facilities like **Lenox** and **Kenilworth** perform optimally, while **Hope House** and **Comfort Inn** struggle with higher offline units.
+""")
+
+# Occupancy Rate Overview (Matplotlib)
 st.subheader("1. Occupancy Rate Overview")
 fig, ax = plt.subplots()
 df.set_index("Facility")["Occupancy Rate (%)"].plot(kind="barh", color="#1f77b4", ax=ax)
@@ -66,9 +69,14 @@ plt.xlim(0, 100)
 for index, value in enumerate(df["Occupancy Rate (%)"]):
     plt.text(value + 1, index, f"{value}%", va='center')
 st.pyplot(fig)
-st.write(df[["Facility", "Occupancy Rate (%)"]])
 
-# Chart: Days Offline and Status (Matplotlib)
+# Business Summary for Occupancy Rate
+st.markdown("""
+**Business Summary**:  
+Most facilities have an occupancy rate above 90%, showing strong utilization. **Hope House** and **Best Western** could increase occupancy to match the performance of top facilities like **Lenox**.
+""")
+
+# Days Offline and Unit Status (Matplotlib)
 st.subheader("2. Days Offline and Unit Status")
 fig, ax = plt.subplots()
 df.set_index("Facility")[["Days Offline", "Units Offline"]].plot(kind="bar", stacked=True, color=['#ff7f0e', '#2ca02c'], ax=ax)
@@ -76,7 +84,12 @@ plt.title("Days Offline vs Units Offline")
 plt.ylabel("Days/Units")
 plt.xticks(rotation=45, ha="right")
 st.pyplot(fig)
-st.write(df[["Facility", "Days Offline", "Status", "Details (Repairs Needed)", "Expected Date", "Time of Turnover"]])
+
+# Business Summary for Days Offline and Status
+st.markdown("""
+**Business Summary**:  
+**Light House** and **Comfort Inn** have long periods of offline units, likely due to maintenance issues. Addressing these quickly could reduce downtime and improve efficiency.
+""")
 
 # Facility Performance Comparison (Matplotlib)
 st.subheader("3. Facility Performance Comparison")
@@ -86,9 +99,14 @@ plt.title("Facility Performance Comparison")
 plt.ylabel("Metrics")
 plt.xticks(rotation=45, ha="right")
 st.pyplot(fig)
-st.write(df[["Facility", "Occupancy Rate (%)", "Units Offline", "Units Under Repair", "Days Offline"]])
 
-# Efficiency Metric: Occupied Units vs Available Units (Occupancy Efficiency - Matplotlib)
+# Business Summary for Facility Performance
+st.markdown("""
+**Business Summary**:  
+Facilities like **Ellington** and **Apollo** show strong performance with high occupancy rates and minimal offline units, while **Light House** and **Hope House** need improvements.
+""")
+
+# Efficiency Metric (Matplotlib)
 st.subheader("4. Occupancy Efficiency Metric")
 fig, ax = plt.subplots()
 df.set_index("Facility")["Occupancy Efficiency (%)"].plot(kind="barh", color="#d62728", ax=ax)
@@ -99,7 +117,12 @@ plt.xlim(0, 100)
 for index, value in enumerate(df["Occupancy Efficiency (%)"]):
     plt.text(value + 1, index, f"{value:.1f}%", va='center')
 st.pyplot(fig)
-st.write(df[["Facility", "Occupancy Efficiency (%)", "Cribs", "Days Offline"]])
+
+# Business Summary for Occupancy Efficiency
+st.markdown("""
+**Business Summary**:  
+**Kenilworth** and **Lenox** operate at full capacity, showing 100% efficiency. However, **Light House** and **Comfort Inn** suffer from low efficiency due to offline units.
+""")
 
 # Download option
 st.subheader("Download Data")
