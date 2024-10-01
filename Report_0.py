@@ -30,7 +30,7 @@ df = pd.DataFrame(data)
 df['Occupancy Efficiency (%)'] = (df["Total Units"] - df["Units Offline"]) / df["Total Units"] * 100
 
 # Streamlit App Title
-st.title("CRF Vacancy Control Dashboard with Metric Comparison and Business Summaries")
+st.title("Sample Vacancy Control Dashboard")
 
 # Plotly Stacked Bar Chart for Comparison
 def plot_comparison_chart(metrics):
