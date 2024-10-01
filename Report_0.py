@@ -2,6 +2,14 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 
+# Plotly: Stacked Bar Chart for Occupancy Rate and Available Units
+st.write("### Occupancy Rate and Available Units by Facility (Stacked Bar)")
+fig = px.bar(df, x='Facility Name', y=['Occupancy Rate (%)', 'Available Units'],
+             title='Occupancy Rate and Available Units by Facility',
+             labels={'value': 'Percentage/Units', 'variable': 'Metric'},
+             barmode='stack')
+fig.update_layout(xaxis_tickangle=-45)
+st.plotly_chart(fig)
 # Sample data extracted from the CRF Vacancy Control Dashboards
 data = {
     "Facility": [
