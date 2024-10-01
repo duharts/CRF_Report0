@@ -29,7 +29,17 @@ df = pd.DataFrame(data)
 df['Occupancy Efficiency (%)'] = (df["Total Units"] - df["Units Offline"]) / df["Total Units"] * 100
 
 # Streamlit App Title
-st.title("CRF Vacancy Control Dashboard with Business Summaries")
+st.title("CRF Vacancy Control Dashboard with Business Summaries and Tables")
+
+# Display the raw data as a table
+st.subheader("Facility Data Overview")
+st.write(df)
+
+# Business Summary for Table
+st.markdown("""
+**Business Summary**:  
+The table above provides an overview of all facilities' key data points, including total units, available units, offline units, and occupancy rate. Facilities like **Lenox** and **Kenilworth** demonstrate high efficiency, while **Hope House** and **Light House** show higher downtime and offline units, indicating potential areas for improvement.
+""")
 
 # Function to plot comparison chart
 def plot_comparison_chart(metrics):
@@ -55,7 +65,7 @@ if metrics:
 # Business Summary for Comparison Chart
 st.markdown("""
 **Business Summary**:  
-This comparison highlights how **occupancy rates** and **offline units** differ across facilities. Facilities like **Lenox** and **Kenilworth** are highly efficient, while **Hope House** has room for improvement due to a higher number of offline units.
+This chart compares the **Occupancy Rate** and **Units Offline**. Facilities like **Lenox** and **Kenilworth** perform optimally with high occupancy and few offline units. **Hope House** has a higher number of offline units, which negatively affects its occupancy rate.
 """)
 
 # Occupancy Rate Overview (Matplotlib)
@@ -73,7 +83,7 @@ st.pyplot(fig)
 # Business Summary for Occupancy Rate
 st.markdown("""
 **Business Summary**:  
-Occupancy rates across most facilities exceed 90%, showing efficient use of housing units. **Hope House**, with an occupancy rate of 84%, may need additional measures to improve usage.
+Occupancy rates across most facilities exceed 90%, showing efficient use of housing units. **Hope House**, with an occupancy rate of 84%, could benefit from operational improvements to boost utilization.
 """)
 
 # Days Offline and Unit Status (Matplotlib)
@@ -88,7 +98,7 @@ st.pyplot(fig)
 # Business Summary for Days Offline and Unit Status
 st.markdown("""
 **Business Summary**:  
-**Light House** and **Comfort Inn** have significant downtime due to offline units, which can impact their occupancy and overall efficiency. Reducing the number of days offline could increase their performance.
+**Light House** and **Comfort Inn** have significant downtime due to offline units, which can negatively affect their overall performance. Reducing the number of days offline could significantly improve occupancy rates and efficiency.
 """)
 
 # Facility Performance Comparison (Clustered Bar Chart)
@@ -103,7 +113,7 @@ st.pyplot(fig)
 # Business Summary for Facility Performance
 st.markdown("""
 **Business Summary**:  
-While **Kenilworth** and **Lenox** continue to excel in performance, facilities like **Hope House** and **Light House** have more offline units and repairs, reducing their overall efficiency.
+While **Kenilworth** and **Lenox** show high performance with minimal repairs and offline units, **Hope House** and **Light House** are underperforming with more offline units, which lowers their overall efficiency.
 """)
 
 # Occupancy Efficiency Metric (Matplotlib)
@@ -121,7 +131,7 @@ st.pyplot(fig)
 # Business Summary for Occupancy Efficiency
 st.markdown("""
 **Business Summary**:  
-**Kenilworth** and **Lenox** are running at full efficiency, while **Light House** and **Comfort Inn** need to address inefficiencies caused by offline units. Improving their occupancy efficiency could enhance overall performance.
+**Kenilworth** and **Lenox** operate at full efficiency, utilizing all available units. However, **Light House** and **Comfort Inn** suffer from lower efficiency due to a high number of offline units. Addressing these inefficiencies could improve their overall performance.
 """)
 
 # Download option
