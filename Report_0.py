@@ -82,6 +82,9 @@ for index, value in enumerate(df["Occupancy Rate (%)"]):
     plt.text(value + 1, index, f"{value}%", va='center')
 st.pyplot(fig)
 
+# Display the table for Occupancy Rate
+st.write(df[['Facility', 'Occupancy Rate (%)']])
+
 # Business Summary for Occupancy Rate
 st.markdown("""
 **Business Summary**:  
@@ -97,6 +100,9 @@ plt.ylabel("Days/Units")
 plt.xticks(rotation=45, ha="right")
 st.pyplot(fig)
 
+# Display the table for Days Offline and Units Offline
+st.write(df[['Facility', 'Days Offline', 'Units Offline']])
+
 # Business Summary for Days Offline and Status
 st.markdown("""
 **Business Summary**:  
@@ -111,6 +117,9 @@ plt.title("Facility Performance Comparison")
 plt.ylabel("Metrics")
 plt.xticks(rotation=45, ha="right")
 st.pyplot(fig)
+
+# Display the table for Facility Performance
+st.write(df[['Facility', 'Occupancy Rate (%)', 'Units Offline', 'Units Under Repair']])
 
 # Business Summary for Facility Performance
 st.markdown("""
@@ -129,6 +138,9 @@ plt.xlim(0, 100)
 for index, value in enumerate(df["Occupancy Efficiency (%)"]):
     plt.text(value + 1, index, f"{value:.1f}%", va='center')
 st.pyplot(fig)
+
+# Display the table for Occupancy Efficiency
+st.write(df[['Facility', 'Occupancy Efficiency (%)']])
 
 # Business Summary for Occupancy Efficiency
 st.markdown("""
