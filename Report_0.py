@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
+import matplotlib.pyplot as plt
 
 # Sample data extracted from the CRF Vacancy Control Dashboards
 data = {
@@ -18,7 +19,11 @@ data = {
     "Units Offline": [10, 8, 8, 2, 1, 5, 3, 0, 31, 6, 8, 8, 0],
     "Occupancy Rate (%)": [85, 96, 84, 99, 99, 94, 93, 100, 87, 94, 92, 93, 100],
     "Cribs": [10, 20, 5, 15, 7, 9, 4, 2, 12, 6, 10, 8, 5],
-    "Days Offline": [5, 8, 10, 12, 2, 14, 7, 5, 25, 6, 12, 10, 0]
+    "Days Offline": [5, 8, 10, 12, 2, 14, 7, 5, 25, 6, 12, 10, 0],
+    "Status": ["Under Repair", "Maintenance", "Available", "Maintenance", "Repair", "Repair", "Repair", "Available", "Maintenance", "Repair", "Available", "Maintenance", "Available"],
+    "Details (Repairs Needed)": ["Plumbing", "Electrical", "Ready", "HVAC", "Roof", "Extermination", "Flooring", "Paint", "Renovation", "Fumigation", "Ready", "Structural", "Ready"],
+    "Expected Date": ["2024-09-20", "2024-09-18", "N/A", "2024-09-22", "2024-09-25", "2024-09-30", "2024-09-23", "N/A", "2024-09-30", "2024-09-26", "N/A", "2024-09-30", "N/A"],
+    "Time of Turnover": ["5:00 PM", "3:00 PM", "N/A", "4:00 PM", "2:00 PM", "5:00 PM", "12:00 PM", "N/A", "1:00 PM", "5:00 PM", "N/A", "6:00 PM", "N/A"]
 }
 
 # Convert data to DataFrame
@@ -30,7 +35,7 @@ df['Occupancy Efficiency (%)'] = (df["Total Units"] - df["Units Offline"]) / df[
 # Streamlit App Title
 st.title("CRF Vacancy Control Dashboard with Metric Comparison")
 
-# Plotly Stacked Bar Chart for Comparison
+# Updated Plotly Comparison Chart
 def plot_comparison_chart(metrics):
     df_melted = df.melt(id_vars="Facility", value_vars=metrics, var_name="Metric", value_name="Value")
     fig = px.bar(df_melted, x="Facility", y="Value", color="Metric",
@@ -50,13 +55,51 @@ metrics = st.multiselect(
 if metrics:
     plot_comparison_chart(metrics)
 
-# Plotly: Days Offline and Unit Status (Stacked Bar Chart)
+# Sleeker Occupancy Rate Overview (Matplotlib)
+st.subheader("1. Occupancy Rate Overview")
+fig, ax = plt.subplots()
+df.set_index("Facility")["Occupancy Rate (%)"].plot(kind="barh", color="#1f77b4", ax=ax)
+plt.title("Occupancy Rate by Facility")
+plt.xlabel("Occupancy Rate (%)")
+plt.ylabel("Facility")
+plt.xlim(0, 100)
+for index, value in enumerate(df["Occupancy Rate (%)"]):
+    plt.text(value + 1, index, f"{value}%", va='center')
+st.pyplot(fig)
+st.write(df[["Facility", "Occupancy Rate (%)"]])
+
+# Chart: Days Offline and Status (Matplotlib)
 st.subheader("2. Days Offline and Unit Status")
-df_status = df[['Facility', 'Days Offline', 'Units Offline']]
-df_status_melted = df_status.melt(id_vars='Facility', var_name='Status', value_name='Units')
-fig_status = px.bar(df_status_melted, x='Facility', y='Units', color='Status', title='Days Offline vs Units Offline')
-fig_status.update_layout(barmode='stack', xaxis_tickangle=-45)
-st.plotly_chart(fig_status)
+fig, ax = plt.subplots()
+df.set_index("Facility")[["Days Offline", "Units Offline"]].plot(kind="bar", stacked=True, color=['#ff7f0e', '#2ca02c'], ax=ax)
+plt.title("Days Offline vs Units Offline")
+plt.ylabel("Days/Units")
+plt.xticks(rotation=45, ha="right")
+st.pyplot(fig)
+st.write(df[["Facility", "Days Offline", "Status", "Details (Repairs Needed)", "Expected Date", "Time of Turnover"]])
+
+# Facility Performance Comparison (Matplotlib)
+st.subheader("3. Facility Performance Comparison")
+fig, ax = plt.subplots()
+df.set_index("Facility")[["Occupancy Rate (%)", "Units Offline", "Units Under Repair"]].plot(kind="bar", ax=ax)
+plt.title("Facility Performance Comparison")
+plt.ylabel("Metrics")
+plt.xticks(rotation=45, ha="right")
+st.pyplot(fig)
+st.write(df[["Facility", "Occupancy Rate (%)", "Units Offline", "Units Under Repair", "Days Offline"]])
+
+# Efficiency Metric: Occupied Units vs Available Units (Occupancy Efficiency - Matplotlib)
+st.subheader("4. Occupancy Efficiency Metric")
+fig, ax = plt.subplots()
+df.set_index("Facility")["Occupancy Efficiency (%)"].plot(kind="barh", color="#d62728", ax=ax)
+plt.title("Occupancy Efficiency by Facility")
+plt.xlabel("Occupancy Efficiency (%)")
+plt.ylabel("Facility")
+plt.xlim(0, 100)
+for index, value in enumerate(df["Occupancy Efficiency (%)"]):
+    plt.text(value + 1, index, f"{value:.1f}%", va='center')
+st.pyplot(fig)
+st.write(df[["Facility", "Occupancy Efficiency (%)", "Cribs", "Days Offline"]])
 
 # Download option
 st.subheader("Download Data")
